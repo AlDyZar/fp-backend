@@ -17,4 +17,8 @@ class UserRepository{
         $this->user = $user;
     }
 
+    public function insert($data){
+
+    }
+
 }

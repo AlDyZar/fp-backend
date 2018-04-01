@@ -27,6 +27,7 @@ Route::apiResource('items', 'ItemController')->only(['index', 'show']);
 Route::group(['middleware' => 'jwt.auth'], function() {
     Route::get('logout', 'AuthController@logout');
     Route::get('user', 'AuthController@me');
+    Route::patch('user', 'AuthController@updateProfile');
     Route::apiResource('cart', 'CartController')->except(['show']);
     Route::get('pay', 'VtwebController@vtweb');
 });

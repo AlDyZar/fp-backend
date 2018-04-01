@@ -62,30 +62,30 @@ class VtwebController extends Controller
         $billing_address = array(
             'first_name'        => $user['name'],
             'last_name'         => $user['last_name'],
-            'address'           => "Karet Belakang 15A, Setiabudi.",
-            'city'                  => "Jakarta",
-            'postal_code'   => "51161",
-            'phone'                 => "081322311801",
-            'country_code'  => 'IDN'
+            'address'           => $user['address'],
+            'city'                  => $user['city'],
+            'postal_code'   => $user['postal_code'],
+            'phone'                 => $user['phone'],
+            'country_code'  => $user['country_code']
             );
 
         // Populate customer's shipping address
         $shipping_address = array(
-            'first_name'    => "John",
-            'last_name'     => "Watson",
-            'address'       => "Bakerstreet 221B.",
-            'city'              => "Jakarta",
-            'postal_code' => "51162",
-            'phone'             => "081322311801",
-            'country_code'=> 'IDN'
+            'first_name'    => $user['name'],
+            'last_name'     => $user['last_name'],
+            'address'       => $user['address'],
+            'city'              => $user['city'],
+            'postal_code' => $user['postal_code'],
+            'phone'             => $user['phone'],
+            'country_code'=> $user['country_code']
             );
 
         // Populate customer's Info
         $customer_details = array(
-            'first_name'            => "Andri",
-            'last_name'             => "Setiawan",
-            'email'                     => "andrisetiawan@asdasd.com",
-            'phone'                     => "081322311801",
+            'first_name'            => $user['name'],
+            'last_name'             =>  $user['last_name'],
+            'email'                     => $user['email'],
+            'phone'                     => $user['phone'],
             'billing_address' => $billing_address,
             'shipping_address'=> $shipping_address
             );
