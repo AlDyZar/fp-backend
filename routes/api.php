@@ -23,15 +23,14 @@ Route::get('', function (){
 Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login');
 Route::apiResource('items', 'ItemController')->only(['index', 'show']);
+Route::apiResource('category', 'CategoryController')->only(['index', 'show']);
 
 Route::group(['middleware' => 'jwt.auth'], function() {
     Route::get('logout', 'AuthController@logout');
     Route::get('user', 'AuthController@me');
     Route::patch('user', 'AuthController@updateProfile');
     Route::apiResource('cart', 'CartController')->except(['show']);
+    Route::apiResource('transaction', 'AppTransactionController')->only(['index', 'show']);
+    Route::apiResource('history', 'HistoryController')->only(['index', 'show']);
     Route::get('pay', 'VtwebController@vtweb');
 });
-
-Route::get('item/create', 'TestElasticSearchController@index');
-Route::get('item', 'TestElasticSearchController@all');
-Route::post('item', 'TestElasticSearchController@insert');
