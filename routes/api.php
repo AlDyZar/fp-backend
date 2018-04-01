@@ -31,3 +31,7 @@ Route::group(['middleware' => 'jwt.auth'], function() {
     Route::apiResource('cart', 'CartController')->except(['show']);
     Route::get('pay', 'VtwebController@vtweb');
 });
+
+Route::get('item/create', 'TestElasticSearchController@index');
+Route::get('item', 'TestElasticSearchController@all');
+Route::post('item', 'TestElasticSearchController@insert');

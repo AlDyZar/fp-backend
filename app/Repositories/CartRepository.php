@@ -44,4 +44,8 @@ class CartRepository{
         return $this->cart->where('user_id', $user_id)->where('id', $id)->delete();
     }
 
+    public function deleteUserCart($user_id){
+        return $this->cart->where('user_id', $user_id)->delete();
+    }
+
 }

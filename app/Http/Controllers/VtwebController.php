@@ -5,14 +5,18 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Repositories\CartRepository;
+use App\Repositories\TransactionRepository;
+use App\Repositories\ItemRepository;
 
 use App\Veritrans\Veritrans;
 
 class VtwebController extends Controller
 {
-    public function __construct(CartRepository $cr)
+    public function __construct(CartRepository $cr, TransactionRepository $tr, ItemRepository $ir)
     {
         $this->cr = $cr;
+        $this->tr = $tr;
+        $this->ir = $ir;
         Veritrans::$serverKey = 'SB-Mid-server-4EmqIn59cgQy4Ny2GgZ9dwAs';
 
         //set Veritrans::$isProduction  value to true for production mode
@@ -24,8 +28,16 @@ class VtwebController extends Controller
         $vt = new Veritrans;
         $user = auth()->user();
         $tempArr = $this->cr->all($user['id']);
+        if(count($tempArr) <= 0){
+            return response(['msg' => ['Add a product please']]);
+        }
         $total = 0;
         $items = [];
+        $this->cr->deleteUserCart($user['id']);
+        $tr_id = $this->tr->createTransaction($user['id']);
+        /*
+         * Validate and add total price
+         */
         foreach ($tempArr as $temp){
             $total += (int)$temp['price'] * $temp['qty'];
             $arr = [
@@ -34,11 +46,15 @@ class VtwebController extends Controller
                 'quantity' => $temp['qty'],
                 'name' => $temp['name'],
             ];
+            if($temp['qty'] < $this->ir->find($temp['item'])){
+
+            }
             array_push($items, $arr);
+            $this->tr->insertTransactionDetail($tr_id, $temp['id'], $temp['qty']);
         }
 
         $transaction_details = array(
-            'order_id'          => uniqid(),
+            'order_id'          => $tr_id,
             'gross_amount'  => $total
         );
 
@@ -66,7 +82,7 @@ class VtwebController extends Controller
             'city'                  => $user['city'],
             'postal_code'   => $user['postal_code'],
             'phone'                 => $user['phone'],
-            'country_code'  => $user['country_code']
+            'country_code'  => 'IDN'
             );
 
         // Populate customer's shipping address
@@ -77,7 +93,7 @@ class VtwebController extends Controller
             'city'              => $user['city'],
             'postal_code' => $user['postal_code'],
             'phone'             => $user['phone'],
-            'country_code'=> $user['country_code']
+            'country_code'=> 'IDN'
             );
 
         // Populate customer's Info
@@ -111,10 +127,12 @@ class VtwebController extends Controller
         catch (Exception $e) 
         {
             return response(["msg" => "server error"], 500);
-            //return $e->getMessage;
         }
     }
 
+    /*
+     * Notification
+     */
     public function notification()
     {
         $vt = new Veritrans;

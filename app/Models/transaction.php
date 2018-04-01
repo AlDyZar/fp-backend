@@ -17,4 +17,8 @@ class transaction extends Model
     protected $primaryKey = "id";
     //public $timestamps = false;
     public $incrementing = false;
+
+    public function detail(){
+        return $this->hasMany('App\Models\transaction_detail');
+    }
 }

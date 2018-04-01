@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class category_detail extends Model
 {
     //
+    protected $fillable = [
+      'category_id', 'key'
+    ];
+
     protected $hidden = [
         'created_at', 'updated_at'
     ];
