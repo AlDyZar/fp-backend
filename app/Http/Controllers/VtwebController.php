@@ -23,6 +23,103 @@ class VtwebController extends Controller
         Veritrans::$isProduction = false;
     }
 
+    public function pay(Request $request){
+        $vt = new Veritrans;
+        $user = auth()->user();
+        $temp = $this->ir->find($request->input('item_id'));
+        $total = (int)$temp['price'] * $temp['qty'];;
+        $items = [
+            [
+                'id' => $temp['id'],
+                'price' => (int)$temp['price'],
+                'quantity' => $temp['qty'],
+                'name' => $temp['name'],
+            ]
+        ];
+
+        $tr_id = $this->tr->createOneTransaction($user['id'], $temp['id'], $total, $temp['qty']);
+        //return response($tr_id, 500);
+        /*
+         * Validate and add total price
+         */
+
+        $transaction_details = array(
+            'order_id'          => $tr_id,
+            'gross_amount'  => $total
+        );
+
+        // Populate items
+//        $items = [
+//            array(
+//                'id'                => 'item1',
+//                'price'         => 100000,
+//                'quantity'  => 1,
+//                'name'          => 'Adidas f50'
+//            ),
+//            array(
+//                'id'                => 'item2',
+//                'price'         => 50000,
+//                'quantity'  => 2,
+//                'name'          => 'Nike N90'
+//            )
+//        ];
+
+        // Populate customer's billing address
+        $billing_address = array(
+            'first_name'        => $user['name'],
+            'last_name'         => $user['last_name'],
+            'address'           => $user['address'],
+            'city'                  => $user['city'],
+            'postal_code'   => $user['postal_code'],
+            'phone'                 => $user['phone'],
+            'country_code'  => 'IDN'
+        );
+
+        // Populate customer's shipping address
+        $shipping_address = array(
+            'first_name'    => $user['name'],
+            'last_name'     => $user['last_name'],
+            'address'       => $user['address'],
+            'city'              => $user['city'],
+            'postal_code' => $user['postal_code'],
+            'phone'             => $user['phone'],
+            'country_code'=> 'IDN'
+        );
+
+        // Populate customer's Info
+        $customer_details = array(
+            'first_name'            => $user['name'],
+            'last_name'             =>  $user['last_name'],
+            'email'                     => $user['email'],
+            'phone'                     => $user['phone'],
+            'billing_address' => $billing_address,
+            'shipping_address'=> $shipping_address
+        );
+
+        // Data yang akan dikirim untuk request redirect_url.
+        // Uncomment 'credit_card_3d_secure' => true jika transaksi ingin diproses dengan 3DSecure.
+        $transaction_data = array(
+            'payment_type'          => 'vtweb',
+            'vtweb'                         => array(
+                //'enabled_payments'    => [],
+                'credit_card_3d_secure' => true
+            ),
+            'transaction_details'=> $transaction_details,
+            'item_details'           => $items,
+            'customer_details'   => $customer_details
+        );
+
+        try
+        {
+            $vtweb_url = $vt->vtweb_charge($transaction_data);
+            return response(["url" => $vtweb_url], 200);
+        }
+        catch (Exception $e)
+        {
+            return response(["msg" => "server error"], 500);
+        }
+    }
+
     public function vtweb() 
     {
         $vt = new Veritrans;
@@ -34,20 +131,22 @@ class VtwebController extends Controller
         $total = 0;
         $items = [];
         $this->cr->deleteUserCart($user['id']);
-        $tr_id = $this->tr->createTransaction($user['id']);
+        foreach ($tempArr as $temp){
+            $total += (int)$temp['price'] * $temp['qty'];
+        }
+        $tr_id = $this->tr->createTransaction($user['id'], $total);
         /*
          * Validate and add total price
          */
         foreach ($tempArr as $temp){
-            $total += (int)$temp['price'] * $temp['qty'];
             $arr = [
                 'id' => $temp['id'],
                 'price' => (int)$temp['price'],
                 'quantity' => $temp['qty'],
                 'name' => $temp['name'],
             ];
-            if($temp['qty'] < $this->ir->find($temp['item'])){
-
+            if($temp['qty'] > $this->ir->find($temp['item'])){
+                return response( ['msg' => ['Cart Quantity over Stock Quantity']],422);
             }
             array_push($items, $arr);
             $this->tr->insertTransactionDetail($tr_id, $temp['id'], $temp['qty']);

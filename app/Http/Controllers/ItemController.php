@@ -22,34 +22,28 @@ class ItemController extends Controller
      */
     public function index(Request $request)
     {
-//        if($request->input('name')) {
-//            $resp = $this->item->paginateSearch(4, $request->input('name'));
-//            if(count($resp->toArray()['data'])>0){
-//                return response($resp, 200);
-//            }else{
-//                return response($resp, 404);
-//            }
-//        }else{
-//            $resp = $this->item->paginate(4);
-//            if(count($resp->toArray()['data'])>0){
-//                return response($resp, 200);
-//            }else{
-//                return response($resp, 404);
-//            }
-//        }
-        try {
-            if ($request->input('name') && $request->input('category')) {
-                return $this->iesm->search($request->input('category'), $request->input('name'));
-            } else if ($request->input('name')) {
-                return $this->iesm->search('item', $request->input('name'));
-            } else if ($request->input('category')) {
-                return $this->iesm->getAll($request->input('category'));
-            } else {
-                return $this->iesm->getAll('item');
+        if($request->input('name')) {
+            $resp = $this->item->allName($request->input('name'));
+            if(count($resp->toArray())>0){
+                return response($resp, 200);
+            }else{
+                return response($resp, 404);
             }
-        }catch (\Exception $e){
-            return response(['msg' => ['Server error']], 500);
+        }else{
+            $resp = $this->item->all();
+            if(count($resp->toArray())>0){
+                return response($resp, 200);
+            }else{
+                return response($resp, 404);
+            }
         }
+//        try {
+//            if ($request->input('name')) {
+//                return $this->iesm->search($request->input('name'))['hits'];
+//            }
+//        }catch (\Exception $e){
+//            return response(['msg' => ['Server error']], 500);
+//        }
     }
 
     public function show($id)

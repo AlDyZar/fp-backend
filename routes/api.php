@@ -33,4 +33,5 @@ Route::group(['middleware' => 'jwt.auth'], function() {
     Route::apiResource('transaction', 'AppTransactionController')->only(['index', 'show']);
     Route::apiResource('history', 'HistoryController')->only(['index', 'show']);
     Route::get('pay', 'VtwebController@vtweb');
+    Route::post('pay', 'VtwebController@pay');
 });

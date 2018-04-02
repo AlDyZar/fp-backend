@@ -12,12 +12,13 @@ use App\ElasticSearchModels\ElasticSearchModel;
 
 class ItemElasticSearchModel extends ElasticSearchModel
 {
+    protected $index = 'item';
     protected $type = '_doc';
     protected $size = 4;
 
-    public function getAll($index){
+    public function getAll(){
         $params = [
-            'index' => $index,
+            'index' => $this->index,
             'type' => '_doc',
         ];
 
@@ -25,9 +26,9 @@ class ItemElasticSearchModel extends ElasticSearchModel
         return $response;
     }
 
-    public function search($index, $name){
+    public function search($name){
         $params = [
-            'index' => $index,
+            'index' => $this->index,
             'type' => $this->type,
             'body' => [
                 'query' => [
@@ -42,9 +43,9 @@ class ItemElasticSearchModel extends ElasticSearchModel
         return $response;
     }
 
-    public function find($index, $id){
+    public function find($id){
         $params = [
-            'index' => $index,
+            'index' => $this->index,
             'id' => $id
         ];
 

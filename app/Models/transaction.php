@@ -7,8 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class transaction extends Model
 {
     //
+    protected $fillable = [
+      'user_id', 'item_id', 'qty', 'total', 'status'
+    ];
     protected $hidden = [
-        'created_at', 'updated_at'
+        'updated_at'
     ];
 
     protected $casts = [
@@ -16,7 +19,7 @@ class transaction extends Model
     ];
     protected $primaryKey = "id";
     //public $timestamps = false;
-    public $incrementing = false;
+    //public $incrementing = false;
 
     public function detail(){
         return $this->hasMany('App\Models\transaction_detail');

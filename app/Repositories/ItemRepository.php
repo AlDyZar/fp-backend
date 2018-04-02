@@ -18,6 +18,14 @@ class ItemRepository{
         $this->item = $item;
     }
 
+    public function allName($name){
+        return $this->item->where('name','ILIKE' ,'%'.$name.'%')->get();
+    }
+
+    public function all(){
+        return $this->item->all();
+    }
+
     public function paginateSearch($perpage, $name){
         return $this->item->where('name','ILIKE' ,'%'.$name.'%')->paginate($perpage);
     }

@@ -20,17 +20,30 @@ class TransactionRepository
     }
 
     public function all($user_id){
-        return $this->tr->find($user_id);
+        return $this->tr->where('user_id', $user_id)->get();
     }
 
     public function find($id){
         return $this->tr->find($id)->detail;
     }
 
-    public function createTransaction($user_id){
+    public function createOneTransaction($user_id, $item_id, $total, $qty){
+        $data = transaction::create([
+            'user_id' => $user_id,
+            'item_id' => $item_id,
+            'qty' => $qty,
+            'status' => 'PAYMENT',
+            'total' => $total
+        ]);
+
+        return $data->id;
+    }
+
+    public function createTransaction($user_id, $total){
         $transaction = $this->tr->create([
             'user_id' => $user_id,
             'status' => 'PAYMENT',
+            'total' => $total
         ]);
 
         return $transaction['id'];
